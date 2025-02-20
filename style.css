@@ -33,6 +33,7 @@ button {
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    margin-top: 10px;
 }
 
 button:hover {
@@ -42,4 +43,29 @@ button:hover {
 .qr-code-result img {
     margin-top: 15px;
     max-width: 100%;
+}
+
+.hidden {
+    display: none;
+}
+
+#loading {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #666;
+}
+
+.spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #4CAF50;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }

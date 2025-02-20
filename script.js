@@ -1,5 +1,5 @@
-const API_URL = 'https://elastic.snaplogic.com/api/1/rest/slsched/feed/StadeToulousainProd/SI%20-%20General/00.%20Pipelines/CREATE%20Qr%20Code%20Task'; // Optionnel, mais pas avec un .env sur GitHub Pages
-const BEARER_TOKEN = 'Hub0ZvaOvcT8Ztw4cTiRE7JsN1PXk4Wa';
+let qrCodeBlob; // Pour stocker l'image binaire
+let currentCodeNumber = ''; // Pour savoir comment nommer le fichier
 
 async function generateQRCode() {
     const codenumber = document.getElementById('codenumber').value;
@@ -10,13 +10,20 @@ async function generateQRCode() {
         return;
     }
 
-    const url = `${API_URL}?codenumber=${encodeURIComponent(codenumber)}&email=${encodeURIComponent(email)}`;
+    currentCodeNumber = codenumber; // Pour le nom du fichier à la fin
+
+    // Affiche le chargement
+    document.getElementById('loading').classList.remove('hidden');
+    document.getElementById('qrCodeResult').innerHTML = '';
+    document.getElementById('downloadBtn').classList.add('hidden');
+
+    const url = `${CONFIG.API_URL}?codenumber=${encodeURIComponent(codenumber)}&email=${encodeURIComponent(email)}`;
 
     try {
         const response = await fetch(url, {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${BEARER_TOKEN}`,
+                'Authorization': `Bearer ${CONFIG.BEARER_TOKEN}`,
                 'Accept': '*/*',
             },
         });
@@ -25,11 +32,28 @@ async function generateQRCode() {
             throw new Error(`Erreur API: ${response.status} - ${response.statusText}`);
         }
 
-        const blob = await response.blob();
-        const imageUrl = URL.createObjectURL(blob);
+        qrCodeBlob = await response.blob();
+        const imageUrl = URL.createObjectURL(qrCodeBlob);
 
         document.getElementById('qrCodeResult').innerHTML = `<img src="${imageUrl}" alt="QR Code généré" />`;
+        document.getElementById('downloadBtn').classList.remove('hidden');
+
     } catch (error) {
         alert(`Échec : ${error.message}`);
+    } finally {
+        // Masque le chargement
+        document.getElementById('loading').classList.add('hidden');
     }
+}
+
+function downloadQRCode() {
+    if (!qrCodeBlob) {
+        alert("Générez d'abord un QR Code.");
+        return;
+    }
+
+    const downloadLink = document.createElement('a');
+    downloadLink.href = URL.createObjectURL(qrCodeBlob);
+    downloadLink.download = `${currentCodeNumber}.png`;
+    downloadLink.click();
 }
