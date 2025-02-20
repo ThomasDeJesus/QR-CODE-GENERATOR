@@ -17,7 +17,7 @@ async function generateQRCode() {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${BEARER_TOKEN}`,
-                'Accept': 'image/png',
+                'Accept': '*/*',
             },
         });
 
