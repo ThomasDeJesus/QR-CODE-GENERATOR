@@ -57,3 +57,10 @@ function downloadQRCode() {
     downloadLink.download = `${currentCodeNumber}.png`;
     downloadLink.click();
 }
+
+function resetForm() {
+    document.getElementById('codenumber').value = '';
+    document.getElementById('qrCodeResult').innerHTML = '';
+    document.getElementById('downloadBtn').classList.add('hidden');
+    document.getElementById('resetBtn').classList.add('hidden');
+}
