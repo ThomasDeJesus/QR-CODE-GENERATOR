@@ -37,6 +37,8 @@ async function generateQRCode() {
 
         document.getElementById('qrCodeResult').innerHTML = `<img src="${imageUrl}" alt="QR Code généré" />`;
         document.getElementById('downloadBtn').classList.remove('hidden');
+        document.getElementById('resetBtn').classList.remove('hidden');
+
 
     } catch (error) {
         alert(`Échec : ${error.message}`);
