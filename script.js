@@ -12,7 +12,7 @@ async function generateQRCode() {
 
     currentCodeNumber = codenumber; // Pour le nom du fichier à la fin
 
-    // Affiche le chargement
+    // Affiche le spinner de chargement
     document.getElementById('loading').classList.remove('hidden');
     document.getElementById('qrCodeResult').innerHTML = '';
     document.getElementById('downloadBtn').classList.add('hidden');
@@ -41,7 +41,7 @@ async function generateQRCode() {
     } catch (error) {
         alert(`Échec : ${error.message}`);
     } finally {
-        // Masque le chargement
+        // Cache le spinner
         document.getElementById('loading').classList.add('hidden');
     }
 }
