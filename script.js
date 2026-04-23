@@ -68,11 +68,14 @@ async function renderQRCode() {
     const border = parseInt(document.getElementById('borderSize').value, 10) || 0;
 
     const inner = document.createElement('canvas');
-    await QRCode.toCanvas(inner, currentContent, {
-        errorCorrectionLevel: 'M',
-        margin: 0,
-        width: QR_WIDTH,
-        color: { dark: darkHex, light: lightHex },
+    new QRious({
+        element: inner,
+        value: currentContent,
+        size: QR_WIDTH,
+        level: 'M',
+        padding: 0,
+        foreground: darkHex,
+        background: lightHex,
     });
 
     const finalCanvas = document.createElement('canvas');
