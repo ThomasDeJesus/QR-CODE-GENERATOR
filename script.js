@@ -62,6 +62,29 @@ function hexToRgb(hex) {
     };
 }
 
+function detectContentBounds(data, width, height) {
+    const isDark = (x, y) => {
+        const i = (y * width + x) * 4;
+        const lum = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+        return lum < 128;
+    };
+    let top = 0, bottom = height - 1, left = 0, right = width - 1;
+    topLoop: for (; top < height; top++) {
+        for (let x = 0; x < width; x++) if (isDark(x, top)) break topLoop;
+    }
+    bottomLoop: for (; bottom >= top; bottom--) {
+        for (let x = 0; x < width; x++) if (isDark(x, bottom)) break bottomLoop;
+    }
+    leftLoop: for (; left < width; left++) {
+        for (let y = top; y <= bottom; y++) if (isDark(left, y)) break leftLoop;
+    }
+    rightLoop: for (; right >= left; right--) {
+        for (let y = top; y <= bottom; y++) if (isDark(right, y)) break rightLoop;
+    }
+    if (top > bottom || left > right) return { x: 0, y: 0, w: width, h: height };
+    return { x: left, y: top, w: right - left + 1, h: bottom - top + 1 };
+}
+
 async function applyCustomization() {
     if (!qrCodeBlob) return;
 
@@ -79,12 +102,26 @@ async function applyCustomization() {
         i.src = imgUrl;
     });
 
-    // Canvas temporaire pour recolorer le QR code
+    // Canvas source : décodage brut
+    const src = document.createElement('canvas');
+    src.width = img.width;
+    src.height = img.height;
+    const sctx = src.getContext('2d');
+    sctx.drawImage(img, 0, 0);
+
+    // Détecte la vraie zone du QR (ignore la quiet zone ajoutée par l'API)
+    const bounds = detectContentBounds(
+        sctx.getImageData(0, 0, src.width, src.height).data,
+        src.width,
+        src.height,
+    );
+
+    // Canvas recadré pour ne contenir que les modules utiles
     const inner = document.createElement('canvas');
-    inner.width = img.width;
-    inner.height = img.height;
+    inner.width = bounds.w;
+    inner.height = bounds.h;
     const ictx = inner.getContext('2d');
-    ictx.drawImage(img, 0, 0);
+    ictx.drawImage(src, bounds.x, bounds.y, bounds.w, bounds.h, 0, 0, bounds.w, bounds.h);
 
     const data = ictx.getImageData(0, 0, inner.width, inner.height);
     const px = data.data;
@@ -101,8 +138,8 @@ async function applyCustomization() {
 
     // Canvas final avec bordure
     const finalCanvas = document.createElement('canvas');
-    finalCanvas.width = img.width + border * 2;
-    finalCanvas.height = img.height + border * 2;
+    finalCanvas.width = inner.width + border * 2;
+    finalCanvas.height = inner.height + border * 2;
     const fctx = finalCanvas.getContext('2d');
     fctx.fillStyle = lightHex;
     fctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
