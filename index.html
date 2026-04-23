@@ -15,6 +15,23 @@
         <label for="email">Email :</label>
         <input type="email" id="email" placeholder="Entrez l'email" required />
 
+        <div class="customization">
+            <label>Couleur des carrés :</label>
+            <div class="color-row">
+                <input type="color" id="darkColor" value="#000000" />
+                <input type="text" id="darkColorHex" class="hex-input" value="#000000" maxlength="7" placeholder="#000000" />
+            </div>
+
+            <label>Couleur du fond :</label>
+            <div class="color-row">
+                <input type="color" id="lightColor" value="#ffffff" />
+                <input type="text" id="lightColorHex" class="hex-input" value="#ffffff" maxlength="7" placeholder="#ffffff" />
+            </div>
+
+            <label for="borderSize">Taille des bords : <span id="borderSizeValue">20</span> px</label>
+            <input type="range" id="borderSize" min="0" max="100" value="20" />
+        </div>
+
         <button onclick="generateQRCode()">Générer QR Code</button>
 
         <div id="loading" class="hidden">

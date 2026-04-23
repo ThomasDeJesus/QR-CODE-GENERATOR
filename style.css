@@ -45,6 +45,57 @@ button:hover {
     max-width: 100%;
 }
 
+.customization {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    text-align: left;
+    font-size: 13px;
+}
+
+.customization label {
+    display: block;
+    margin-top: 6px;
+    color: #333;
+}
+
+.customization input[type="color"] {
+    width: 48px;
+    height: 32px;
+    padding: 2px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.color-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 4px 0;
+}
+
+.hex-input {
+    flex: 1;
+    width: auto;
+    margin: 0;
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: monospace;
+    text-transform: lowercase;
+}
+
+.hex-input.invalid {
+    border-color: #af4c4c;
+    background-color: #fdecec;
+}
+
+.customization input[type="range"] {
+    width: 100%;
+    margin: 4px 0;
+}
+
 .hidden {
     display: none;
 }
