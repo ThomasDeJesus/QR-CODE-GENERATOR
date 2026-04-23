@@ -1,7 +1,6 @@
 const ALLOWED_EMAIL_DOMAIN = '@stadetoulousain.fr';
 const QR_WIDTH = 300;
 
-let customizedBlob;
 let currentContent = '';
 let currentFileName = '';
 
@@ -60,7 +59,19 @@ function sanitizeFileName(content) {
     return base || 'qrcode';
 }
 
-async function renderQRCode() {
+function getOrCreatePreviewCanvas() {
+    const container = document.getElementById('qrCodeResult');
+    let canvas = container.querySelector('canvas');
+    if (!canvas) {
+        container.innerHTML = '';
+        canvas = document.createElement('canvas');
+        canvas.setAttribute('aria-label', 'QR Code généré');
+        container.appendChild(canvas);
+    }
+    return canvas;
+}
+
+function renderQRCode() {
     if (!currentContent) return;
 
     const darkHex = document.getElementById('darkColor').value;
@@ -78,17 +89,13 @@ async function renderQRCode() {
         background: lightHex,
     });
 
-    const finalCanvas = document.createElement('canvas');
-    finalCanvas.width = inner.width + border * 2;
-    finalCanvas.height = inner.height + border * 2;
-    const fctx = finalCanvas.getContext('2d');
-    fctx.fillStyle = lightHex;
-    fctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
-    fctx.drawImage(inner, border, border);
-
-    customizedBlob = await new Promise(res => finalCanvas.toBlob(res, 'image/png'));
-    const previewUrl = URL.createObjectURL(customizedBlob);
-    document.getElementById('qrCodeResult').innerHTML = `<img src="${previewUrl}" alt="QR Code généré" />`;
+    const canvas = getOrCreatePreviewCanvas();
+    canvas.width = inner.width + border * 2;
+    canvas.height = inner.height + border * 2;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = lightHex;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(inner, border, border);
 }
 
 async function generateQRCode() {
@@ -113,7 +120,7 @@ async function generateQRCode() {
     document.getElementById('downloadBtn').classList.add('hidden');
 
     try {
-        await renderQRCode();
+        renderQRCode();
         document.getElementById('downloadBtn').classList.remove('hidden');
         document.getElementById('resetBtn').classList.remove('hidden');
     } catch (error) {
@@ -124,14 +131,17 @@ async function generateQRCode() {
 }
 
 function downloadQRCode() {
-    if (!customizedBlob) {
+    const canvas = document.querySelector('#qrCodeResult canvas');
+    if (!canvas) {
         alert("Générez d'abord un QR Code.");
         return;
     }
-    const downloadLink = document.createElement('a');
-    downloadLink.href = URL.createObjectURL(customizedBlob);
-    downloadLink.download = `${currentFileName}.png`;
-    downloadLink.click();
+    canvas.toBlob(blob => {
+        const downloadLink = document.createElement('a');
+        downloadLink.href = URL.createObjectURL(blob);
+        downloadLink.download = `${currentFileName}.png`;
+        downloadLink.click();
+    }, 'image/png');
 }
 
 function resetForm() {
@@ -139,6 +149,5 @@ function resetForm() {
     document.getElementById('qrCodeResult').innerHTML = '';
     document.getElementById('downloadBtn').classList.add('hidden');
     document.getElementById('resetBtn').classList.add('hidden');
-    customizedBlob = null;
     currentContent = '';
 }
